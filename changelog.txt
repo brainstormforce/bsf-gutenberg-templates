@@ -1,3 +1,6 @@
+v.2.4.26 - 23-April-2026
+- Fix: Removed server-IP geolocation lookups (ipify + ipwho.is) used to pick the Design Library / AI wizard image sources by region. Required for WordPress.org compliance — the template library now surfaces Pexels and Unsplash to all users regardless of server location.
+
 v.2.4.25 - 31-March-2026
 Fix: Resolved click behavior issue on AI dropdown toggle options.
 
