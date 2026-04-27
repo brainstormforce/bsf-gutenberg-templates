@@ -1202,8 +1202,8 @@ class Plugin {
 			true
 		);
 
-		// Google fonts.
-		wp_enqueue_style( 'ast-block-templates-google-fonts', $this->google_fonts_url(), array( 'ast-block-templates' ), 'all' );
+		// Self-hosted fonts (Inter + Figtree).
+		wp_enqueue_style( 'ast-block-templates-fonts', AST_BLOCK_TEMPLATES_URI . 'assets/fonts/fonts.css', array( 'ast-block-templates' ), AST_BLOCK_TEMPLATES_VER );
 
 		$license_status = false;
 		// Check for BSF Core License Manager from any pro plugin.
@@ -1428,30 +1428,6 @@ class Plugin {
 				)
 			)
 		);
-	}
-
-		/**
-		 * Generate and return the Google fonts url.
-		 *
-		 * @since 1.0.1
-		 * @return string
-		 */
-	public function google_fonts_url() {
-
-		$fonts_url     = '';
-		$font_families = array(
-			'Inter:400,500,600',
-			'Figtree:400,500,600,700',
-		);
-
-		$query_args = array(
-			'family' => rawurlencode( implode( '|', $font_families ) ),
-			'subset' => rawurlencode( 'latin,latin-ext' ),
-		);
-
-		$fonts_url = add_query_arg( $query_args, '//fonts.googleapis.com/css' );
-
-		return $fonts_url;
 	}
 
 	/**

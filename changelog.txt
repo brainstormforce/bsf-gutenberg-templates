@@ -1,3 +1,6 @@
+v.2.4.27 - 27-April-2026
+- Fix: Self-host the Inter and Figtree fonts used by the Design Library / template importer UI instead of fetching from fonts.googleapis.com. Required for WordPress.org compliance.
+
 v.2.4.26 - 23-April-2026
 - Fix: Removed server-IP geolocation lookups (ipify + ipwho.is) used to pick the Design Library / AI wizard image sources by region. Required for WordPress.org compliance — the template library now surfaces Pexels and Unsplash to all users regardless of server location.
 
