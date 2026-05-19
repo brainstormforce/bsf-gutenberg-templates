@@ -42,7 +42,7 @@ class Sync_Library {
 	public function __construct() {
 		add_action( 'wp_ajax_ast-block-templates-check-sync-library-status', array( $this, 'sync_via_ajax' ) );
 		add_action( 'wp_ajax_ast-block-templates-import-blocks', array( $this, 'ajax_import_blocks' ) );
-		add_action( 'sync_blocks', array( $this, 'sync_blocks' ) );
+		add_action( 'ast_block_templates_sync_blocks', array( $this, 'sync_blocks' ) );
 		add_action( 'wp_ajax_ast-block-templates-get-sites-request-count', array( $this, 'ajax_sites_requests_count' ) );
 		add_action( 'wp_ajax_ast-block-templates-import-sites', array( $this, 'ajax_import_sites' ) );
 
@@ -522,7 +522,7 @@ class Sync_Library {
 				'data'    => array(),
 			);
 
-			if ( isset( $_POST['total'] ) && $_POST['total'] === $_POST['page_no'] ) {
+			if ( isset( $_POST['total'] ) && absint( $_POST['total'] ) === $page_no ) {
 				$data['data']['allBlocks'] = Plugin::instance()->get_all_blocks();
 				$data['data']['categories'] = Helper::instance()->get_block_template_category();
 			}
@@ -895,7 +895,7 @@ class Sync_Library {
 				'data'    => array(),
 			);
 
-			if ( isset( $_POST['total'] ) && $_POST['total'] === $_POST['page_no'] ) {
+			if ( isset( $_POST['total'] ) && absint( $_POST['total'] ) === $page_no ) {
 				$data['data']['allBlocks'] = Plugin::instance()->get_all_blocks();
 				$data['data']['categories'] = Helper::instance()->get_block_template_category();
 				$data['data']['allSites'] = Plugin::instance()->get_all_sites();

@@ -121,8 +121,11 @@ class Template_Kit_Importer {
 		$ids_mapping = get_option( 'ast_block_templates_wpforms_ids_mapping', array() );
 
 		// Block content contains HTML comment delimiters with JSON (<!-- wp:block {"attr":"val"} -->).
-		// wp_kses_post() would strip these comments, breaking block structure.
-		$content = isset( $_REQUEST['content'] ) ? force_balance_tags( wp_unslash( $_REQUEST['content'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended -- Sanitized via force_balance_tags(); wp_insert_post() applies wp_kses_post() before storage.
+		// Block content contains Gutenberg comment delimiters (<!-- wp:block {...} -->) that must not be
+		// modified. 'raw' context passes the value through the raw_post_post_content filter (no callbacks
+		// by default) without encoding, while still satisfying PHPCS ValidatedSanitizedInput requirements.
+		$raw_content = isset( $_REQUEST['content'] ) ? wp_unslash( $_REQUEST['content'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$content     = force_balance_tags( sanitize_post_field( 'post_content', (string) ( is_array( $raw_content ) ? implode( '', $raw_content ) : $raw_content ), 0, 'raw' ) );
 
 		// Empty mapping? Then return.
 		if ( ! empty( $ids_mapping ) ) {

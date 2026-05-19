@@ -137,7 +137,7 @@ const HeaderAIDropdown = ( {
 				setAllBlocksData( response.blocks );
 			}
 			if ( ! response.success ) {
-				throw new Error( response?.data?.data );
+				throw new Error( 'Settings update failed.' );
 			}
 		} catch ( error ) {
 			logError( error );

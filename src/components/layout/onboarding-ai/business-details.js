@@ -42,11 +42,7 @@ const BusinessDetails = ( { onClickContinue } ) => {
 					'X-WP-Nonce': ast_block_template_vars.rest_api_nonce,
 				},
 			} );
-			if ( response.success ) {
-				setSiteLanguageListAIStep( response?.data?.data );
-			} else {
-				throw new Error( response?.data?.data );
-			}
+			setSiteLanguageListAIStep( response?.data );
 		} catch ( error ) {
 			logError( error );
 		}

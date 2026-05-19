@@ -81,11 +81,7 @@ const BusinessTypes = () => {
 				signal: reqAbort.current.signal,
 			} );
 
-			if ( response.success ) {
-				setBusinessTypeListAIStep( response?.data?.data );
-			} else {
-				throw new Error( response?.data?.data );
-			}
+			setBusinessTypeListAIStep( response?.data );
 
 			setIsFetching( false );
 		} catch ( error ) {

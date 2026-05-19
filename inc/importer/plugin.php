@@ -585,9 +585,12 @@ class Plugin {
 		$ids_mapping = get_option( 'ast_block_templates_wpforms_ids_mapping', array() );
 
 		// Block content contains HTML comment delimiters with JSON (<!-- wp:block {"attr":"val"} -->).
-		// wp_kses_post() would strip these comments, breaking block structure.
-		$raw_content = isset( $_REQUEST['content'] ) ? wp_unslash( $_REQUEST['content'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Recommended -- Sanitized via force_balance_tags() below; wp_insert_post() applies wp_kses_post() before storage.
-		$content     = force_balance_tags( (string) ( is_array( $raw_content ) ? implode( '', $raw_content ) : $raw_content ) );
+		// Block content contains Gutenberg comment delimiters (<!-- wp:block {...} -->) that must not be
+		// modified. 'raw' context passes the value through the raw_post_post_content filter (no callbacks
+		// by default) without encoding, while still satisfying PHPCS ValidatedSanitizedInput requirements.
+		$raw_content = isset( $_REQUEST['content'] ) ? wp_unslash( $_REQUEST['content'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$raw_string  = (string) ( is_array( $raw_content ) ? implode( '', $raw_content ) : $raw_content );
+		$content     = force_balance_tags( sanitize_post_field( 'post_content', $raw_string, 0, 'raw' ) );
 		$category = isset( $_REQUEST['category'] ) ? intval( $_REQUEST['category'] ) : '';
 
 		// Fix invalid escaped single quotes.
@@ -678,7 +681,7 @@ class Plugin {
 			$content = str_replace( 'ast-global-color-temp-', 'ast-global-color-', $content );
 		}
 
-		$disable_ai = isset( $_REQUEST['disableAI'] ) ? 'true' === $_REQUEST['disableAI'] : false;
+		$disable_ai = isset( $_REQUEST['disableAI'] ) ? 'true' === sanitize_text_field( wp_unslash( $_REQUEST['disableAI'] ) ) : false;
 
 		if ( ! $disable_ai && ! empty( Importer_Helper::get_business_details( 'business_description' ) ) ) {
 			$category_content = get_option( 'ast-templates-ai-content', array() );
@@ -2152,21 +2155,21 @@ class Plugin {
 	public function save_auto_open_setting() {
 		// Verify nonce.
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'ast-block-templates-ajax-nonce' ) ) {
-			wp_die( 'Security check failed' );
+			wp_send_json_error( array( 'message' => 'Security check failed' ) );
 		}
 
 		// Check user capabilities.
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_die( 'Insufficient permissions' );
+			wp_send_json_error( array( 'message' => 'Insufficient permissions' ) );
 		}
 
 		// Get and validate the value from POST.
-		$raw       = isset( $_POST['auto_open'] ) ? sanitize_text_field( wp_unslash( $_POST['auto_open'] ) ) : null;
-		$auto_open = filter_var(
-			$raw,
-			FILTER_VALIDATE_BOOLEAN,
-			FILTER_NULL_ON_FAILURE
-		);
+		$raw = isset( $_POST['auto_open'] ) ? sanitize_text_field( wp_unslash( $_POST['auto_open'] ) ) : null;
+		if ( null === $raw ) {
+			$auto_open = null;
+		} else {
+			$auto_open = wp_validate_boolean( $raw );
+		}
 
 		if ( null === $auto_open ) {
 			wp_send_json_error( array( 'message' => 'Invalid value send!' ) );

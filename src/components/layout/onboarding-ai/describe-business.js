@@ -21,7 +21,6 @@ import {
 import { withDispatch, useSelect, useDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { toast } from 'react-toastify';
-import toaster from '../../reusable/toaster';
 import { __ } from '@wordpress/i18n';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import StyledText from '../../reusable/styled-text/StyledText';
@@ -50,10 +49,7 @@ const generateContentOptions = async ( {
 			},
 		} );
 
-		if ( response?.success ) {
-			return response?.data?.data;
-		}
-		console.error( response?.data?.data );
+		return response?.data;
 	} catch ( error ) {
 		toast.error( toastBody( error ) );
 	}
@@ -180,32 +176,15 @@ const DescribeBusiness = ( { onClickContinue, onClickPrevious } ) => {
 					language_name: selectedLanguage?.name,
 				},
 			} );
-			if ( response.success ) {
-				const description = response.data?.data || [];
-				if ( description !== undefined ) {
-					newDescList.push( description );
+			const description = response.data || [];
+			if ( description !== undefined ) {
+				newDescList.push( description );
 
-					addDescriptionToList( newDescList );
+				addDescriptionToList( newDescList );
 
-					setValue( 'businessDetails', description, {
-						shouldValidate: true,
-					} );
-				}
-			}
-			if ( ! response.success ) {
-				toast(
-					toaster( {
-						title: __(
-							'Description Generation Error!',
-							'ast-block-templates'
-						),
-						message: __(
-							'Failed to generate business description using AI. Please retry or enter details manually.',
-							'ast-block-templates'
-						),
-					} ),
-					toaster.getOptions( { type: 'error' } )
-				);
+				setValue( 'businessDetails', description, {
+					shouldValidate: true,
+				} );
 			}
 		} catch ( error ) {
 			// Do nothing
@@ -236,17 +215,12 @@ const DescribeBusiness = ( { onClickContinue, onClickPrevious } ) => {
 					category: businessType,
 				},
 			} );
-			if ( response.success ) {
-				const keywordsData = JSON.parse( response.data?.data );
-				setWebsiteKeywordsAIStep(
-					Array.isArray( keywordsData )
-						? keywordsData
-						: Object.values( keywordsData )
-				);
-			}
-			if ( ! response.success ) {
-				throw new Error( response?.data?.data );
-			}
+			const keywordsData = typeof response.data === 'string' ? JSON.parse( response.data ) : response.data;
+			setWebsiteKeywordsAIStep(
+				Array.isArray( keywordsData )
+					? keywordsData
+					: Object.values( keywordsData )
+			);
 		} catch ( error ) {
 			logError( error );
 		} finally {

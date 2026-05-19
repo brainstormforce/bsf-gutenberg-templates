@@ -126,12 +126,10 @@ class Settings extends Api_Base {
 		$nonce = (string) $request->get_header( 'X-WP-Nonce' );
 		// Verify the nonce.
 		if ( ! wp_verify_nonce( sanitize_text_field( $nonce ), 'wp_rest' ) ) {
-			wp_send_json_error(
-				array(
-					'data' => __( 'Nonce verification failed.', 'ast-block-templates' ),
-					'status'  => false,
-
-				)
+			return new \WP_Error(
+				'nonce_verification_failed',
+				__( 'Nonce verification failed.', 'ast-block-templates' ),
+				array( 'status' => 403 )
 			);
 		}
 
@@ -180,7 +178,7 @@ class Settings extends Api_Base {
 		return new \WP_Error(
 			'failed',
 			__( 'Sorry, settings are not saved.', 'ast-block-templates' ),
-			array( 'status' => 'fail' )
+			array( 'status' => 400 )
 		);
 	}
 }

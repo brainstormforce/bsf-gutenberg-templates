@@ -636,11 +636,7 @@ const Images = ( {
 				},
 				signal: abortController.signal,
 			} );
-			const imageResponse = res.data?.data || [];
-
-			if ( ! res.success ) {
-				throw new Error( res?.data?.data );
-			}
+			const imageResponse = res.data || [];
 
 			// If there are no images, blacklist the engine
 			if ( imageResponse?.length === 0 ) {
