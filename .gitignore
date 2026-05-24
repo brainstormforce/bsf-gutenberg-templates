@@ -22,3 +22,4 @@ ast-block-templates/
 
 # Claude Code
 .claude/settings.local.json
+config.bat
